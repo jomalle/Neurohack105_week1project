@@ -2,8 +2,9 @@
 """Fetch the two RBC datasets into data/ (gitignored).
 
 1. PNC FreeSurfer derivatives, QC-passed subjects only (DataLad + git-annex).
-   Only the *_brainmeasures.tsv files are pulled -- the full recon-all
-   tarballs in the same dataset would be ~375 GB.
+   Pulls the *_brainmeasures.tsv (global/subcortical) and *_regionsurfacestats.tsv
+   (per-region) files, ~3.9 GB -- the full recon-all tarballs in the same dataset
+   would be ~375 GB.
 2. PNC harmonized phenotypes, including the McElroy p-factor (plain TSV).
 
 Both are openly accessible; content comes from the public fcp-indi S3 bucket.
@@ -34,12 +35,17 @@ def main():
         # datalad clone has no -b flag; check out the QC-passed branch after.
         run(["git", "checkout", QC_BRANCH], cwd=FS)
 
-    tsvs = subprocess.run(
-        ["git", "ls-files", "freesurfer/*/*_brainmeasures.tsv"],
-        cwd=FS, capture_output=True, text=True, check=True,
-    ).stdout.split()
-    run(["datalad", "get", "-J", "8", *tsvs], cwd=FS)
-    print(f"brainmeasures: {len(tsvs)} subjects")
+    # Global/subcortical measures, and per-region stats (Schaefer, Glasser, etc.).
+    for pattern, label in (
+        ("freesurfer/*/*_brainmeasures.tsv", "brainmeasures"),
+        ("freesurfer/*/*_regionsurfacestats.tsv", "regionsurfacestats"),
+    ):
+        tsvs = subprocess.run(
+            ["git", "ls-files", pattern],
+            cwd=FS, capture_output=True, text=True, check=True,
+        ).stdout.split()
+        run(["datalad", "get", "-J", "8", *tsvs], cwd=FS)
+        print(f"{label}: {len(tsvs)} subjects")
 
     for name in ("study-PNC_desc-participants.tsv", "study-PNC_desc-participants.json"):
         dest = DATA / name.replace("study-PNC_desc-", "PNC_")

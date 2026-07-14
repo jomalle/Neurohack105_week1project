@@ -43,9 +43,10 @@ uv run scripts/get_data.py
 Pulls into `data/` (gitignored):
 
 - **`PNC_FreeSurfer/`** — Reproducible Brain Charts PNC FreeSurfer derivatives,
-  `complete-pass-0.1` branch (QC-passed only): **1,439 subjects**, 361 morphometry
-  columns each in `freesurfer/sub-*/sub-*_brainmeasures.tsv`.
-  The script fetches only these TSVs (~18 MB); the full recon-all tarballs in the
+  `complete-pass-0.1` branch (QC-passed only), **1,439 subjects**. Two file types per
+  subject: `*_brainmeasures.tsv` (global/subcortical measures) and
+  `*_regionsurfacestats.tsv` (per-region stats: Schaefer, Glasser, AAL, and others).
+  The script fetches only these TSVs (~3.9 GB); the full recon-all tarballs in the
   same dataset are ~375 GB.
 - **`PNC_participants.tsv`** — harmonized phenotypes, including the McElroy p-factor
   (`p_factor_mcelroy_harmonized_all_samples`) plus internalizing/externalizing/attention.
